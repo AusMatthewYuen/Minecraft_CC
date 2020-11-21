@@ -128,7 +128,7 @@ function set_z_orientation_negative(current_orientation)
   end
  end 
 
-function navigation_to_target(x_steps, y_steps, z_steps)
+function navigation_to_target(x_steps, y_steps, z_steps,current_orientation)
 
 	if x_steps >= 0 then 
 	set_x_orientation_positive(current_orientation)
@@ -166,6 +166,6 @@ end
 
 
 local current_orientation = calculate_orientation()
-local x_steps, y_steps, z_steps = calculate_steps(11,66,144)
+local x_steps, y_steps, z_steps = calculate_steps(11,66,144, current_orientation)
 navigation_to_target(x_steps, y_steps, z_steps)
 
