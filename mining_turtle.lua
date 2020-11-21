@@ -145,4 +145,15 @@ dig_and_move_forward(x_steps)
 end
 
 if z_steps >= 0 then
-set_z_orientation(current_orientation)
+set_z_orientation_positive(current_orientation)
+current_orientation = 2 
+dig_and_move_forward(z_steps)
+
+elseif z_steps < 0 then 
+set_z_orientation_negative(current_orientation)
+current_orientation = 4
+dig_and_move_forward(z_steps)
+
+end
+
+
