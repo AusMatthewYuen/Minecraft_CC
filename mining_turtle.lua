@@ -156,4 +156,12 @@ dig_and_move_forward(math.abs(z_steps))
 
 end
 
+if y_steps >= 0 then
+dig_and_move_down(math.abs(y_steps))
+
+elseif y_steps < 0 then 
+dig_and_move_up(math.abs(y_steps))
+
+end
+
 
