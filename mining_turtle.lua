@@ -166,6 +166,6 @@ end
 
 
 local current_orientation = calculate_orientation()
-local x_steps, y_steps, z_steps = calculate_steps(11,66,144, current_orientation)
-navigation_to_target(x_steps, y_steps, z_steps)
+local x_steps, y_steps, z_steps = calculate_steps(11,66,144)
+navigation_to_target(x_steps, y_steps, z_steps, current_orientation)
 
