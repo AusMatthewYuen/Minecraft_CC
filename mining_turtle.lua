@@ -128,40 +128,44 @@ function set_z_orientation_negative(current_orientation)
   end
  end 
 
+function navigation_to_target(x_steps, y_steps, z_steps)
+
+	if x_steps >= 0 then 
+	set_x_orientation_positive(current_orientation)
+	current_orientation = 1 
+	dig_and_move_forward(math.abs(x_steps))
+
+	elseif x_steps < 0 then 
+	set_x_orientation_negative(current_orientation)
+	current_orientation = 3
+	dig_and_move_forward(math.abs(x_steps))
+
+	end
+
+	if z_steps >= 0 then
+	set_z_orientation_positive(current_orientation)
+	current_orientation = 2 
+	dig_and_move_forward(math.abs(z_steps))
+
+	elseif z_steps < 0 then 
+	set_z_orientation_negative(current_orientation)
+	current_orientation = 4
+	dig_and_move_forward(math.abs(z_steps))
+
+	end
+
+	if y_steps >= 0 then
+	dig_and_move_down(math.abs(y_steps))
+
+	elseif y_steps < 0 then 
+	dig_and_move_up(math.abs(y_steps))
+
+	end
+
+end
+
 
 local current_orientation = calculate_orientation()
 local x_steps, y_steps, z_steps = calculate_steps(11,66,144)
-
-if x_steps >= 0 then 
-set_x_orientation_positive(current_orientation)
-current_orientation = 1 
-dig_and_move_forward(math.abs(x_steps))
-
-elseif x_steps < 0 then 
-set_x_orientation_negative(current_orientation)
-current_orientation = 3
-dig_and_move_forward(math.abs(x_steps))
-
-end
-
-if z_steps >= 0 then
-set_z_orientation_positive(current_orientation)
-current_orientation = 2 
-dig_and_move_forward(math.abs(z_steps))
-
-elseif z_steps < 0 then 
-set_z_orientation_negative(current_orientation)
-current_orientation = 4
-dig_and_move_forward(math.abs(z_steps))
-
-end
-
-if y_steps >= 0 then
-dig_and_move_down(math.abs(y_steps))
-
-elseif y_steps < 0 then 
-dig_and_move_up(math.abs(y_steps))
-
-end
-
+navigation_to_target(x_steps, y_steps, z_steps)
 
