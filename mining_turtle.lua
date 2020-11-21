@@ -132,24 +132,24 @@ function navigation_to_target(x_steps, y_steps, z_steps,current_orientation)
 
 	if x_steps >= 0 then 
 	set_x_orientation_positive(current_orientation)
-	current_orientation = 1 
+	local current_orientation = 1 
 	dig_and_move_forward(math.abs(x_steps))
 
 	elseif x_steps < 0 then 
 	set_x_orientation_negative(current_orientation)
-	current_orientation = 3
+	local current_orientation = 3
 	dig_and_move_forward(math.abs(x_steps))
 
 	end
 
 	if z_steps >= 0 then
 	set_z_orientation_positive(current_orientation)
-	current_orientation = 2 
+	local current_orientation = 2 
 	dig_and_move_forward(math.abs(z_steps))
 
 	elseif z_steps < 0 then 
 	set_z_orientation_negative(current_orientation)
-	current_orientation = 4
+	local current_orientation = 4
 	dig_and_move_forward(math.abs(z_steps))
 
 	end
@@ -160,12 +160,44 @@ function navigation_to_target(x_steps, y_steps, z_steps,current_orientation)
 	elseif y_steps < 0 then 
 	dig_and_move_up(math.abs(y_steps))
 
+	end 
+	
+	if z_steps >= 0 then return current_orientation
+	elseif z_steps < 0 then return current_orientation
+	
 	end
 
 end
 
+function mining_quarry(x,y,z, current_orientation)
+
+	if current_orientation == 2 then
+		turtle.turnLeft()
+	elseif current_orientation == 4 then
+		turtle.turnRight()
+	end
+	
+	for i = 1, y do
+		for i = 1, z do
+		dig_and_move_forward(x - 1)
+		turtle.turnRight()
+		dig_and_move_forward(1)
+		turtle.turnRight()
+		end
+	
+	dig_and_move_down(1)	
+	end
+end
+	
+	
+	
+
 
 local current_orientation = calculate_orientation()
 local x_steps, y_steps, z_steps = calculate_steps(11,66,144)
-navigation_to_target(x_steps, y_steps, z_steps, current_orientation)
+local current_orientation =  navigation_to_target(x_steps, y_steps, z_steps, current_orientation)
+
+mining_quarry(5,5,5,current_orientation)
+
+
 
