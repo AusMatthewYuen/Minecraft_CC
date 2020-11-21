@@ -178,43 +178,46 @@ function mining_quarry(x,y,z, current_orientation)
 	
 		if (i % 2) ~= 0 then
 			for q = 1, z do
-				if q == 1 and i = 1 then
+				if q == 1 and i == 1 then
 				dig_and_move_forward(x - 1)
+				turtle.turnLeft()
+				dig_and_move_forward(1)
+				turtle.turnLeft()
 				elseif q == z then
 				turtle.turnLeft()
 				turtle.turnLeft()
 				dig_and_move_forward(x - 1)
-				elseif (q % 2) ~= 0 then
-				dig_and_move_forward(x - 1)
-				turtle.turnRight()
-				dig_and_move_forward(1)
-				turtle.turnRight()
 				elseif (q % 2) == 0 then
 				dig_and_move_forward(x - 1)
 				turtle.turnLeft()
 				dig_and_move_forward(1)
 				turtle.turnLeft()
+				elseif (q % 2) ~= 0 then
+				dig_and_move_forward(x - 1)
+				turtle.turnRight()
+				dig_and_move_forward(1)
+				turtle.turnRight()
 				end
 			end
 					
 		else
 			for q = 1, z do
-				if q = 1 then 
+				if q == 1 then 
 				turtle.turnLeft()
 				turtle.turnLeft()
 				turtle.dig_and_move_forward(x - 1)
 				elseif q == z then
 				dig_and_move_forward(x - 1)
-				elseif (q % 2) ~= 0 then
-				dig_and_move_forward(x - 1)
-				turtle.turnLeft()
-				dig_and_move_forward(1)
-				turtle.turnLeft()
 				elseif (q % 2) == 0 then
 				dig_and_move_forward(x - 1)
 				turtle.turnRight()
 				dig_and_move_forward(1)
 				turtle.turnRight()
+				elseif (q % 2) ~= 0 then
+				dig_and_move_forward(x - 1)
+				turtle.turnLeft()
+				dig_and_move_forward(1)
+				turtle.turnLeft()
 				end
 			end
 		
