@@ -135,24 +135,24 @@ local x_steps, y_steps, z_steps = calculate_steps(11,66,144)
 if x_steps >= 0 then 
 set_x_orientation_positive(current_orientation)
 current_orientation = 1 
-dig_and_move_forward(x_steps)
+dig_and_move_forward(math.abs(x_steps))
 
 elseif x_steps < 0 then 
 set_x_orientation_negative(current_orientation)
 current_orientation = 3
-dig_and_move_forward(x_steps)
+dig_and_move_forward(math.abs(x_steps))
 
 end
 
 if z_steps >= 0 then
 set_z_orientation_positive(current_orientation)
 current_orientation = 2 
-dig_and_move_forward(z_steps)
+dig_and_move_forward(math.abs(z_steps))
 
 elseif z_steps < 0 then 
 set_z_orientation_negative(current_orientation)
 current_orientation = 4
-dig_and_move_forward(z_steps)
+dig_and_move_forward(math.abs(z_steps))
 
 end
 
