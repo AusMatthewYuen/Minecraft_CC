@@ -200,30 +200,48 @@ function mining_quarry(x,y,z, current_orientation)
 				
 			else 
 				
-				if q == z then
-					dig_and_move_forward(x_mine)
-					turtle.turnRight()
-					turtle.turnRight()
-				elseif q == 1 and i == 1
-					dig_and_move_forward(x_mine)
-					turtle.turnRight()
-					dig_and_move_forward(1)
-					turtle.turnRight()
-				elseif q == 1 then
-					dig_and_move_forward(x_mine)
-					turtle.turnLeft()
-					dig_and_move_forward(1)
-					turtle.turnLeft()
-				elseif q % 2 ~= 0 then
-					dig_and_move_forward(x_mine)
-					turtle.turnRight()
-					dig_and_move_forward(1)
-					turtle.turnRight()
-				else 
-					dig_and_move_forward(x_mine)
-					turtle.turnLeft()
-					dig_and_move_forward(1)
-					turtle.turnLeft()
+				dig_and_move_forward(x_mine)
+				turtle.turnRight()
+				dig_and_move_forward(1)
+				turtle.turnRight()
+				
+				if i % 2 ~= 0 then
+	
+					if q == z then
+						dig_and_move_forward(x_mine)
+						turtle.turnRight()
+						turtle.turnRight()
+					elseif q % 2 ~= 0 then
+						dig_and_move_forward(x_mine)
+						turtle.turnRight()
+						dig_and_move_forward(1)
+						turtle.turnRight()
+					else 
+						dig_and_move_forward(x_mine)
+						turtle.turnLeft()
+						dig_and_move_forward(1)
+						turtle.turnLeft()
+					end
+						
+				else
+					
+					if q == z then
+						dig_and_move_forward(x_mine)
+						turtle.turnRight()
+						turtle.turnRight()
+					elseif q % 2 ~= 0 then
+						dig_and_move_forward(x_mine)
+						turtle.turnLeft()
+						dig_and_move_forward(1)
+						turtle.turnLeft()
+					else 
+						dig_and_move_forward(x_mine)
+						turtle.turnRight()
+						dig_and_move_forward(1)
+						turtle.turnRight()
+					end
+						
+						
 				end
 				
 			end
@@ -242,7 +260,7 @@ end
 
 
 current_orientation = calculate_orientation()
-x_steps, y_steps, z_steps = calculate_steps(-78,185,71)
+x_steps, y_steps, z_steps = calculate_steps(13,65,195)
 current_orientation2 =  navigation_to_target(x_steps, y_steps, z_steps, current_orientation)
 
 mining_quarry(4,4,4,current_orientation2)
