@@ -200,10 +200,6 @@ function mining_quarry(x,y,z, current_orientation)
 				
 			else 
 				
-				dig_and_move_forward(x_mine)
-				turtle.turnRight()
-				dig_and_move_forward(1)
-				turtle.turnRight()
 				
 				if i % 2 ~= 0 then
 	
