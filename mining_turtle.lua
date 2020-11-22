@@ -212,6 +212,7 @@ function mining_quarry(x,y,z, current_orientation)
 				elseif q == 1 then
 					dig_and_move_forward(x_mine)
 					turtle.turnLeft()
+					dig_and_move_forward(1)
 					turtle.turnLeft()
 				elseif q % 2 ~= 0 then
 					dig_and_move_forward(x_mine)
