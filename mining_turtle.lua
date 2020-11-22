@@ -217,7 +217,10 @@ function mining_quarry(x,y,z, current_orientation)
 			end
 		
 		end
-	dig_and_move_down(1)	
+	if i ~= y then
+	dig_and_move_down(1)
+	end 
+	
 	end
 end
 	
