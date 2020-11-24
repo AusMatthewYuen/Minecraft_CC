@@ -303,6 +303,6 @@ current_orientation2 =  navigation_to_target(x_steps, y_steps, z_steps, current_
 mining_quarry(4,4,4,current_orientation2)
 current_orientation = calculate_orientation()
 x_steps, y_steps, z_steps = calculate_steps(origin_x,origin_y,origin_z)
-x_steps, y_steps, z_steps = navigation_to_home(origin_x,origin_y,origin_z, current_orientation)
+navigation_to_home(origin_x,origin_y + 1,origin_z, current_orientation)
 
 
