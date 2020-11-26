@@ -25,8 +25,15 @@ turtle.turnRight()
 
 for i = 1, slots do 
 	turtle.getSelectedSlot(i)
-	print(i)
-	print(turtle.getItemDetail(i))
+	item = turtle.getItemDetail(i)
+	if item ~= nil then
+		print(item["name"])
+		if item["name"] = computercraft:turtle_expanded
+			turtle.dropDown()
+		else 
+			turtle.drop()
+		end
+	end
 end
 	
 turtle.turnLeft()
