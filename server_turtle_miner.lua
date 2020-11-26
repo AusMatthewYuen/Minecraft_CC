@@ -28,7 +28,7 @@ for i = 1, slots do
 	item = turtle.getItemDetail(i)
 	if item ~= nil then
 		print(item["name"])
-		if item["name"] = computercraft:turtle_expanded
+		if item["name"] = "computercraft:turtle_expanded" then
 			turtle.dropDown()
 		else 
 			turtle.drop()
