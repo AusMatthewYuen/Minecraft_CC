@@ -296,12 +296,12 @@ function mining_operations()
 	 
 	-- Arrays start at 1
 	 
-	x = target_table[1]
-	y = target_table[2]
-	z = target_table[3]
-	x_size = target_table[4]
-	y_size = target_table[5]
-	z_size = target_table[6]
+	x = tonumber(target_table[1])
+	y = tonumber(target_table[2])
+	z = tonumber(target_table[3])
+	x_size = tonumber(target_table[4])
+	y_size = tonumber(target_table[5])
+	z_size = tonumber(target_table[6])
 
 
 	current_orientation = calculate_orientation()
