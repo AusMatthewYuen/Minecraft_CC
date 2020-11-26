@@ -12,10 +12,6 @@ engine = create_engine('postgresql+psycopg2://postgres:password@localhost/Minecr
 def hello_world():
     return 'Hello, World!'
 
-@app.route('/<name>')
-def hello_name(name):
-    return "Hello {}!".format(name)
-
 @app.route('/GPS_Setup')
 def gps_link():
     computer_id = request.args.get('computer_id') #if key doesn't exist, returns None
@@ -34,3 +30,10 @@ def gps_link():
     else:
         return_string = str(location['x'][0] +',' + location['y'][0] + ',' + location['z'][0])
         return return_string
+    
+@app.route('/mining_path')
+def mining_request():
+    
+    mining_coordinates = "-91,20,147,4,4,4"
+    
+    return mining_coordinates

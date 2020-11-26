@@ -208,11 +208,7 @@ function mining_quarry(x,y,z, current_orientation)
 
 	x_mine = x - 1
 
-	if current_orientation == 2 then
-		turtle.turnLeft()
-	elseif current_orientation == 4 then
-		turtle.turnRight()
-	end
+	set_x_orientation_positive(current_orientation)
 	
 	for i = 1, y do
 	
@@ -220,24 +216,23 @@ function mining_quarry(x,y,z, current_orientation)
 		
 			if z % 2 ~= 0 then
 				
-				if q == z then
-					dig_and_move_forward(x_mine)
-					turtle.turnRight()
-					turtle.turnRight()
-				elseif q % 2 ~= 0 then
-					dig_and_move_forward(x_mine)
-					turtle.turnRight()
-					dig_and_move_forward(1)
-					turtle.turnRight()
-				else 
-					dig_and_move_forward(x_mine)
-					turtle.turnLeft()
-					dig_and_move_forward(1)
-					turtle.turnLeft()
-				end
+					if q == z then
+						dig_and_move_forward(x_mine)
+						turtle.turnRight()
+						turtle.turnRight()
+					elseif q % 2 ~= 0 then
+						dig_and_move_forward(x_mine)
+						turtle.turnRight()
+						dig_and_move_forward(1)
+						turtle.turnRight()
+					else 
+						dig_and_move_forward(x_mine)
+						turtle.turnLeft()
+						dig_and_move_forward(1)
+						turtle.turnLeft()
+					end
 				
 			else 
-				
 				
 				if i % 2 ~= 0 then
 	
@@ -320,5 +315,7 @@ function mining_operations()
 	navigation_to_home(x_steps,y_steps,z_steps, current_orientation)
 
 end
+
+mining_operations()
 
 
