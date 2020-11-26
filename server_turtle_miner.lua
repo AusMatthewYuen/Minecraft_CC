@@ -16,14 +16,15 @@ end
 turtle.suckDown(1)
 turtle.place()
 panda = turtle.inspect()
-print("panda")
+print(panda)
 newTurtle = peripheral.wrap("front")
 newTurtle.turnOn()
 os.sleep(15)
 turtle.dig()
-turtle.turnLeft()
-
-for i in slots do 
-	turtle.drop(i)
-	
 turtle.turnRight()
+
+for i in 0, slots do 
+	turtle.drop(i)
+end
+	
+turtle.turnLeft()
