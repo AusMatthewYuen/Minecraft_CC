@@ -13,10 +13,12 @@ function string:split(delimiter)
   return result
 end
 
+while(turtle.detect()) do
+	os.sleep(0.5)
+end
+
 turtle.suckDown(1)
 turtle.place()
-panda = turtle.inspect()
-print(panda)
 newTurtle = peripheral.wrap("front")
 newTurtle.turnOn()
 os.sleep(15)
@@ -24,15 +26,16 @@ turtle.dig()
 turtle.turnRight()
 
 for i = 1, slots do 
-	turtle.getSelectedSlot(i)
+	turtle.select(i)
 	item = turtle.getItemDetail(i)
 	if item ~= nil then
 		print(item["name"])
-		if item["name"] = "computercraft:turtle_expanded" then
-			turtle.dropDown()
-		else 
-			turtle.drop()
-		end
+
+			if item["name"] == "computercraft:turtle_expanded" then
+				turtle.dropDown()
+			else 
+				turtle.drop()
+			end
 	end
 end
 	

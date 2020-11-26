@@ -289,19 +289,36 @@ function mining_quarry(x,y,z, current_orientation)
 	end
 end
 	
-	
-	
+function mining_operations()
 
-origin_x ,origin_y , origin_z = gps.locate()
+	origin_x ,origin_y , origin_z = gps.locate()
 
-current_orientation = calculate_orientation()
-x_steps, y_steps, z_steps = calculate_steps(13,65,195) --Rednet receive commands
-current_orientation =  navigation_to_target(x_steps, y_steps, z_steps, current_orientation)
+	request_mining_location = "http://127.0.0.1:5000/mining_path"
+	http_request = http.get(computer_request_location)
+	mining_inputs = http_request.readAll()
+	 
+	target_table = mining_inputs:split(",")
+	 
+	-- Arrays start at 1
+	 
+	x = target_table[1]
+	y = target_table[2]
+	z = target_table[3]
+	x_size = target_table[4]
+	y_size = target_table[5]
+	z_size = target_table[6]
 
-mining_quarry(1,1,1,current_orientation) -- Rednet receive commands
 
-current_orientation = calculate_orientation()
-x_steps, y_steps, z_steps = calculate_steps(origin_x,origin_y,origin_z)
-navigation_to_home(x_steps,y_steps,z_steps, current_orientation)
+	current_orientation = calculate_orientation()
+	x_steps, y_steps, z_steps = calculate_steps(x,y,z) 
+	current_orientation =  navigation_to_target(x_steps, y_steps, z_steps, current_orientation)
+
+	mining_quarry(x_size,y_size,z_size,current_orientation) 
+
+	current_orientation = calculate_orientation()
+	x_steps, y_steps, z_steps = calculate_steps(origin_x,origin_y,origin_z)
+	navigation_to_home(x_steps,y_steps,z_steps, current_orientation)
+
+end
 
 
