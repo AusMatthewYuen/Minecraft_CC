@@ -176,18 +176,6 @@ function navigation_to_home(x_steps, y_steps, z_steps,current_orientation)
 
 	end 
 
-	if x_steps >= 0 then 
-	set_x_orientation_positive(current_orientation)
-	current_orientation = 1 
-	dig_and_move_forward(math.abs(x_steps))
-
-	elseif x_steps < 0 then 
-	set_x_orientation_negative(current_orientation)
-	current_orientation = 3
-	dig_and_move_forward(math.abs(x_steps))
-
-	end
-
 	if z_steps >= 0 then
 	set_z_orientation_positive(current_orientation)
 	current_orientation = 2 
@@ -200,7 +188,17 @@ function navigation_to_home(x_steps, y_steps, z_steps,current_orientation)
 
 	end
 
+	if x_steps >= 0 then 
+	set_x_orientation_positive(current_orientation)
+	current_orientation = 1 
+	dig_and_move_forward(math.abs(x_steps))
 
+	elseif x_steps < 0 then 
+	set_x_orientation_negative(current_orientation)
+	current_orientation = 3
+	dig_and_move_forward(math.abs(x_steps))
+
+	end
 	
 	return current_orientation
 	
@@ -297,13 +295,13 @@ end
 origin_x ,origin_y , origin_z = gps.locate()
 
 current_orientation = calculate_orientation()
-x_steps, y_steps, z_steps = calculate_steps(13,65,195)
+x_steps, y_steps, z_steps = calculate_steps(13,65,195) --Rednet receive commands
 current_orientation =  navigation_to_target(x_steps, y_steps, z_steps, current_orientation)
 
-mining_quarry(1,1,1,current_orientation)
+mining_quarry(1,1,1,current_orientation) -- Rednet receive commands
 
 current_orientation = calculate_orientation()
 x_steps, y_steps, z_steps = calculate_steps(origin_x,origin_y,origin_z)
-navigation_to_home(x_steps,y_steps + 1,z_steps, current_orientation)
+navigation_to_home(x_steps,y_steps,z_steps, current_orientation)
 
 
