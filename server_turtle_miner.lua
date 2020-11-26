@@ -23,8 +23,10 @@ os.sleep(15)
 turtle.dig()
 turtle.turnRight()
 
-for i in 0, slots do 
-	turtle.drop(i)
+for i = 1, slots do 
+	turtle.getSelectedSlot(i)
+	print(i)
+	print(turtle.getItemDetail(i))
 end
 	
 turtle.turnLeft()
