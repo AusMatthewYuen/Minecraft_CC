@@ -289,7 +289,7 @@ function mining_operations()
 	origin_x ,origin_y , origin_z = gps.locate()
 
 	request_mining_location = "http://127.0.0.1:5000/mining_path"
-	http_request = http.get(computer_request_location)
+	http_request = http.get(request_mining_location)
 	mining_inputs = http_request.readAll()
 	 
 	target_table = mining_inputs:split(",")
