@@ -1,3 +1,5 @@
+local SLOT_COUNT = 16
+
 function string:split(delimiter)
   local result = { }
   local from  = 1
@@ -9,6 +11,50 @@ function string:split(delimiter)
   end
   table.insert( result, string.sub( self, from  ) )
   return result
+end
+
+DROPPED_ITEMS = {
+    "minecraft:stone",
+    "minecraft:dirt",
+    "minecraft:cobblestone",
+    "minecraft:sand",
+    "minecraft:gravel",
+    "minecraft:redstone",
+    "minecraft:flint",
+    "railcraft:ore_metal",
+    "extrautils2:ingredients",
+    "minecraft:dye",
+    "thaumcraft:nugget",
+    "thaumcraft:crystal_essence",
+    "thermalfoundation:material",
+    "projectred-core:resource_item",
+    "thaumcraft:ore_cinnabar",
+    "deepresonance:resonating_ore",
+    "forestry:apatite"
+}
+function dropItems()
+    print("Purging Inventory...")
+    for slot = 1, SLOT_COUNT, 1 do
+        local item = turtle.getItemDetail(slot)
+        if(item ~= nil) then
+            for filterIndex = 1, #DROPPED_ITEMS, 1 do
+                if(item["name"] == DROPPED_ITEMS[filterIndex]) then
+                    print("Dropping - " .. item["name"])
+                    turtle.select(slot)
+                    turtle.dropDown()
+                end
+            end
+        end
+    end
+end
+
+function refuel_mid_mining()
+	for slot = 1, SLOT_COUNT, 1 do
+		turtle.select(slot)
+		if(turtle.refuel(1)) then
+			return true
+		end
+	end
 end
 
 function dig_and_move_forward(steps)
@@ -276,7 +322,11 @@ function mining_quarry(x,y,z, current_orientation)
 			end
 		
 		end
-				
+		
+	
+	dropItems()
+	refuel_mid_mining()
+	
 	if i ~= y then
 	dig_and_move_down(1)
 	end 
@@ -291,10 +341,17 @@ function mining_operations()
 	request_mining_location = "http://127.0.0.1:5000/mining_path"
 	http_request = http.get(request_mining_location)
 	mining_inputs = http_request.readAll()
+	
+	while mining_inputs == "no jobs" 
+	do os.sleep(5)
+	request_mining_location = "http://127.0.0.1:5000/mining_path"
+	http_request = http.get(request_mining_location)
+	mining_inputs = http_request.readAll()
+	end
 	 
 	target_table = mining_inputs:split(",")
 	 
-	-- Arrays start at 1
+	-- Arrays start at 1 in lua
 	 
 	x = tonumber(target_table[1])
 	y = tonumber(target_table[2])
