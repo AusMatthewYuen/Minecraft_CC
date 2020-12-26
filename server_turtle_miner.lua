@@ -13,6 +13,16 @@ function string:split(delimiter)
   return result
 end
 
+function reshuffle_turtle()
+   	local success, item = turtle.inspectDown() 
+   	if success then
+       	if item.name == "computercraft:turtle_expanded" then
+         turtle.digUp()
+         turtle.dropDown()
+         end
+     end
+end
+
 function mining_deployment()
 
     mining_turtle_deploy = turtle.suckDown(1)
@@ -30,6 +40,7 @@ function mining_deployment()
     
         while(turtle.detect()) do
         	os.sleep(0.5)
+        	reshuffle_turtle()
         end
     
     else
@@ -49,25 +60,13 @@ while true do
 	if mining_inputs == 0 then
     	print("no jobs available")
     	os.sleep(2)
-          	local success, item = turtle.inspectDown() 
-          	if success then
-              	if item.name == "computercraft:turtle_expanded" then
-                turtle.digUp()
-                turtle.dropDown()
-                end
-            end
+        reshuffle_turtle()
     	
     else mining_deployment()
     
     end
     
-  	local success, item = turtle.inspectDown() 
-  	if success then
-      	if item.name == "computercraft:turtle_expanded" then
-        turtle.digUp()
-        turtle.dropDown()
-        end
-    end
+    reshuffle_turtle()
         
 	
 end
