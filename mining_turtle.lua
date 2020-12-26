@@ -48,6 +48,13 @@ function dropItems()
     end
 end
 
+function drop_point_use()
+    for slot = 1, SLOT_COUNT, 1 do
+                    turtle.select(slot)
+                    turtle.dropDown()
+    end
+end
+
 function refuel_mid_mining()
 	for slot = 1, SLOT_COUNT, 1 do
 		turtle.select(slot)
@@ -414,6 +421,7 @@ function mining_operations()
 	current_x ,current_y , current_z = gps.locate()
 	x_steps, y_steps, z_steps = drop_point_movement(current_x,current_y,current_z)
 	return_navigation(x_steps,y_steps,z_steps, current_orientation)
+	drop_point_use()
 	
 	-- Navigation to Docking Station	
 	current_orientation = calculate_orientation()
