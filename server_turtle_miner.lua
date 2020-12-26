@@ -15,20 +15,26 @@ end
 
 function mining_deployment()
 
-    turtle.suckDown(1)
-    turtle.place()
-    newTurtle = peripheral.wrap("front")
-    newTurtle.turnOn()
-    os.sleep(2)
-
-    while(turtle.detect()) do
-    	os.sleep(0.5)
+    mining_turtle_deploy = turtle.suckDown(1)
+    
+    if mining_turtle_deploy == TRUE
+    
+        turtle.place()
+        newTurtle = peripheral.wrap("front")
+        newTurtle.turnOn()
+        os.sleep(2)
+    
+        while(turtle.detect()) do
+        	os.sleep(0.5)
+        end
+    
+    else
+        os.sleep(2)
+        print("no turtles available")
     end
     
 end
 	
-turtle.turnLeft()
-
 
 while true do 
 
@@ -37,6 +43,7 @@ while true do
 	mining_inputs = http_request.readAll()
 	
 	if mining_inputs == 0 then
+    	print("no jobs available")
     	os.sleep(2)
     	
     else mining_deployment()

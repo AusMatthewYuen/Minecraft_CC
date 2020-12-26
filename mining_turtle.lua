@@ -60,7 +60,10 @@ end
 function dig_and_move_forward(steps)
   for i = 1, steps do
   while turtle.detect() == true do
-	 turtle.dig()
+    	 if turtle.inspect() == "computercraft:turtle_expanded"
+    	 then os.sleep(2)
+    	 else turtle.dig()
+    	 end
      end
   turtle.forward()
   end
@@ -69,7 +72,10 @@ end
 function dig_and_move_down(steps)
   for i = 1, steps do
   while turtle.detectDown() == true do
-	 turtle.digDown()
+    	 if turtle.inspectDown() == "computercraft:turtle_expanded"
+    	 then os.sleep(2)
+    	 else turtle.digDown()
+    	 end
      end
   turtle.down()
   end
@@ -78,7 +84,10 @@ end
 function dig_and_move_up(steps)
   for i = 1, steps do
   while turtle.detectUp() == true do
-	 turtle.digUp()
+    	 if turtle.inspectUp() == "computercraft:turtle_expanded"
+    	 then os.sleep(2)
+    	 else turtle.digUp()
+    	 end
      end
   turtle.up()
   end
@@ -212,7 +221,7 @@ function navigation_to_target(x_steps, y_steps, z_steps,current_orientation)
 	
 end
 
-function navigation_to_home(x_steps, y_steps, z_steps,current_orientation)
+function return_navigation(x_steps, y_steps, z_steps,current_orientation)
 
 	if y_steps >= 0 then
 	dig_and_move_down(math.abs(y_steps))
@@ -333,6 +342,39 @@ function mining_quarry(x,y,z, current_orientation)
 	
 	end
 end
+
+function drop_point_movement(current_x, current_y, current_z)
+
+    request_drop_point_location = "http://127.0.0.1:5000/drop_point_location?".."x="..current_x.."&y="..current_y.."&z="..current_z
+	http_request = http.get(request_drop_point_location)
+	drop_point_inputs = http_request.readAll()
+	
+	target_table = drop_point_inputs:split(",")
+	
+	x = tonumber(target_table[1])
+	y = tonumber(target_table[2])
+	z = tonumber(target_table[3])
+	
+	x_steps, y_steps, z_steps = calculate_steps(x,y,z)
+	
+	return(x_steps, y_steps, z_steps)
+	
+function docking_station_movement(current_x, current_y, current_z)
+
+    request_docking_station_location = "http://127.0.0.1:5000/docking_station_location?".."x="..current_x.."&y="..current_y.."&z="..current_z
+	http_request = http.get(request_docking_station_location)
+	docking_point_inputs = http_request.readAll()
+	
+	target_table = docking_point_inputs:split(",")
+	
+	x = tonumber(target_table[1])
+	y = tonumber(target_table[2])
+	z = tonumber(target_table[3])
+	
+	x_steps, y_steps, z_steps = calculate_steps(x,y,z)
+	
+	return(x_steps, y_steps, z_steps)
+	
 	
 function mining_operations()
 
@@ -360,16 +402,25 @@ function mining_operations()
 	y_size = tonumber(target_table[5])
 	z_size = tonumber(target_table[6])
 
-
 	current_orientation = calculate_orientation()
 	x_steps, y_steps, z_steps = calculate_steps(x,y,z) 
 	current_orientation =  navigation_to_target(x_steps, y_steps, z_steps, current_orientation)
 
 	mining_quarry(x_size,y_size,z_size,current_orientation) 
 
+
+    -- Navigation to Nearest Drop Point	
 	current_orientation = calculate_orientation()
-	x_steps, y_steps, z_steps = calculate_steps(origin_x,origin_y,origin_z)
-	navigation_to_home(x_steps,y_steps,z_steps, current_orientation)
+	current_x ,current_y , current_z = gps.locate()
+	x_steps, y_steps, z_steps = drop_point_movement(current_x,current_y,current_z)
+	return_navigation(x_steps,y_steps,z_steps, current_orientation)
+	
+	-- Navigation to Docking Station	
+	current_orientation = calculate_orientation()
+	current_x ,current_y , current_z = gps.locate()
+	x_steps, y_steps, z_steps = docking_station_movement(current_x,current_y,current_z)
+	return_navigation(x_steps,y_steps,z_steps, current_orientation)
+
 
 end
 

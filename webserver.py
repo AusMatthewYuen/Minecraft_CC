@@ -12,7 +12,7 @@ engine = create_engine('postgresql+psycopg2://postgres:password@localhost/Minecr
 
 @app.route('/')
 def hello_world():
-    return 'Hello, World!'
+    return 'Mining Server Online!'
 
 @app.route('/GPS_Setup')
 def gps_link():
@@ -90,6 +90,84 @@ def mining_queue_add():
     mining_job_splitter(x,y,z,xquarry,yquarry,zquarry,numbots)
     
     return ('job added to queue')
+
+@app.route('/drop_point_location')
+def drop_point_location():
+    x = int(request.args.get('x')) #if key doesn't exist, returns None
+    y = int(request.args.get('y'))
+    z = int(request.args.get('z'))
+    
+    sql_query = """
+    select 
+      x
+    , y 
+    , z
+    
+    from "Mining".infrastructure_locations INFRA
+    where object_type = 'Drop_Point'
+    
+    order by 
+    
+    abs(cast({0} as int) - cast(x as int)) 
+    + abs(cast({1} as int) - cast(y as int)) 
+    + abs(cast({2} as int) - cast(z as int))  asc
+    
+    limit 1
+    """.format(x,y,z)
+    
+    df_closest_drop_point = pd.read_sql_query(con = engine, sql = sql_query)
+    
+    x = df_closest_drop_point['x'][0]
+    y = df_closest_drop_point['y'][0]
+    z = df_closest_drop_point['z'][0]
+    
+    returned_string = str((x,y,z))
+    
+    returned_string = returned_string.replace('(' , "" )
+    returned_string = returned_string.replace(')' , "" )
+    returned_string = returned_string.replace("'" , "" )
+    returned_string = returned_string.replace(" " , "" )
+    
+    return returned_string
+
+@app.route('/docking_station_location')
+def docking_station_location():
+    x = int(request.args.get('x')) #if key doesn't exist, returns None
+    y = int(request.args.get('y'))
+    z = int(request.args.get('z'))
+    
+    sql_query = """
+    select 
+      x
+    , y 
+    , z
+    
+    from "Mining".infrastructure_locations INFRA
+    where object_type = 'Docking_Station'
+    
+    order by 
+    
+    abs(cast({0} as int) - cast(x as int)) 
+    + abs(cast({1} as int) - cast(y as int)) 
+    + abs(cast({2} as int) - cast(z as int))  asc
+    
+    limit 1
+    """.format(x,y,z)
+    
+    df_closest_docking_station = pd.read_sql_query(con = engine, sql = sql_query)
+    
+    x = df_closest_docking_station['x'][0]
+    y = df_closest_docking_station['y'][0]
+    z = df_closest_docking_station['z'][0]
+    
+    returned_string = str((x,y,z))
+    
+    returned_string = returned_string.replace('(' , "" )
+    returned_string = returned_string.replace(')' , "" )
+    returned_string = returned_string.replace("'" , "" )
+    returned_string = returned_string.replace(" " , "" )
+    
+    return returned_string
         
 
 def mining_job_splitter(x, y ,z , xquarry = 50 ,yquarry = 1,zquarry = 1,numbots = 2):
