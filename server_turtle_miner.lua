@@ -25,9 +25,6 @@ function mining_deployment()
     	os.sleep(0.5)
     end
     
-
-    	end
-    end    
 end
 	
 turtle.turnLeft()

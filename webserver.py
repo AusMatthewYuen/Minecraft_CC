@@ -67,7 +67,7 @@ def mining_request():
 
 
 @app.route('/mining_jobs_available')
-def mining_request():
+def mining_jobs_check():
     df_count_result = pd.read_sql_query(con = engine, sql = """select count(*) as count from "Mining".mining_jobs""")
     
     if df_count_result.empty == True:
