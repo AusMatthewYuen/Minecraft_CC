@@ -26,7 +26,7 @@ function mining_deployment()
         turtle.place()
         newTurtle = peripheral.wrap("front")
         newTurtle.turnOn()
-        os.sleep(2)
+        os.sleep(4)
     
         while(turtle.detect()) do
         	os.sleep(0.5)
@@ -52,6 +52,14 @@ while true do
     	
     else mining_deployment()
     
+    end
+    
+  	local success, item = turtle.inspectDown() 
+  	if success then
+      	if item.name == "computercraft:turtle_expanded"
+        turtle.digUp()
+        turtle.dropDown()
+        end
     end
         
 	
