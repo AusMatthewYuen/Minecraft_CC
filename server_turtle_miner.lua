@@ -40,6 +40,8 @@ while true do
     	os.sleep(2)
     	
     else mining_deployment()
+    
+    end
         
 	
 end
