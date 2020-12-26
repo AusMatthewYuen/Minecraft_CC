@@ -366,6 +366,8 @@ function drop_point_movement(current_x, current_y, current_z)
 	
 	return(x_steps, y_steps, z_steps)
 	
+end
+	
 function docking_station_movement(current_x, current_y, current_z)
 
     request_docking_station_location = "http://127.0.0.1:5000/docking_station_location?".."x="..current_x.."&y="..current_y.."&z="..current_z
@@ -382,6 +384,7 @@ function docking_station_movement(current_x, current_y, current_z)
 	
 	return(x_steps, y_steps, z_steps)
 	
+end
 	
 function mining_operations()
 
