@@ -17,7 +17,11 @@ function mining_deployment()
 
     mining_turtle_deploy = turtle.suckDown(1)
     
-    if mining_turtle_deploy == TRUE
+    print(mining_turtle_deploy)
+    
+    if mining_turtle_deploy == true
+    
+        then
     
         turtle.place()
         newTurtle = peripheral.wrap("front")

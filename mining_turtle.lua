@@ -67,8 +67,12 @@ end
 function dig_and_move_forward(steps)
   for i = 1, steps do
   while turtle.detect() == true do
-    	 if turtle.inspect() == "computercraft:turtle_expanded"
-    	 then os.sleep(2)
+    	 local success, item = turtle.inspect() 
+        	 if success then
+            	 if item.name == "computercraft:turtle_expanded"
+            	 then os.sleep(2)
+            	 end
+             end
     	 else turtle.dig()
     	 end
      end
@@ -79,8 +83,12 @@ end
 function dig_and_move_down(steps)
   for i = 1, steps do
   while turtle.detectDown() == true do
-    	 if turtle.inspectDown() == "computercraft:turtle_expanded"
-    	 then os.sleep(2)
+    	 local success, item = turtle.inspectDown() 
+        	 if success then
+            	 if item.name == "computercraft:turtle_expanded"
+            	 then os.sleep(2)
+            	 end
+             end
     	 else turtle.digDown()
     	 end
      end
@@ -91,8 +99,12 @@ end
 function dig_and_move_up(steps)
   for i = 1, steps do
   while turtle.detectUp() == true do
-    	 if turtle.inspectUp() == "computercraft:turtle_expanded"
-    	 then os.sleep(2)
+    	 local success, item = turtle.inspectUp() 
+        	 if success then
+            	 if item.name == "computercraft:turtle_expanded"
+            	 then os.sleep(2)
+            	 end
+             end
     	 else turtle.digUp()
     	 end
      end
@@ -364,7 +376,7 @@ function drop_point_movement(current_x, current_y, current_z)
 	
 	x_steps, y_steps, z_steps = calculate_steps(x,y,z)
 	
-	return(x_steps, y_steps, z_steps)
+	return x_steps, y_steps, z_steps
 	
 end
 	
@@ -382,7 +394,7 @@ function docking_station_movement(current_x, current_y, current_z)
 	
 	x_steps, y_steps, z_steps = calculate_steps(x,y,z)
 	
-	return(x_steps, y_steps, z_steps)
+	return x_steps, y_steps, z_steps
 	
 end
 	
