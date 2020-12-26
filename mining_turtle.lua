@@ -73,6 +73,7 @@ function dig_and_move_forward(steps)
                 	 then os.sleep(2)
                 	 end
                  end
+        	 end
         	 else turtle.dig()
         	 end
          end
@@ -90,6 +91,7 @@ function dig_and_move_down(steps)
                 	 then os.sleep(2)
                 	 end
                  end
+             end
         	 else turtle.digDown()
         	 end
          end
@@ -108,6 +110,7 @@ function dig_and_move_up(steps)
                 	 then os.sleep(2)
                 	 end
                  end
+             end
         	 else turtle.digUp()
         	 end
          end
