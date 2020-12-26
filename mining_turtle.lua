@@ -66,48 +66,52 @@ end
 
 function dig_and_move_forward(steps)
   for i = 1, steps do
-  while turtle.detect() == true do
-    	 local success, item = turtle.inspect() 
-        	 if success then
-            	 if item.name == "computercraft:turtle_expanded"
-            	 then os.sleep(2)
-            	 end
-             end
-    	 else turtle.dig()
-    	 end
-     end
+      while turtle.detect() == true do
+        	 local success, item = turtle.inspect() 
+            	 if success then
+                	 if item.name == "computercraft:turtle_expanded"
+                	 then os.sleep(2)
+                	 end
+                 end
+        	 else turtle.dig()
+        	 end
+         end
+      end
   turtle.forward()
   end
 end
 
 function dig_and_move_down(steps)
   for i = 1, steps do
-  while turtle.detectDown() == true do
-    	 local success, item = turtle.inspectDown() 
-        	 if success then
-            	 if item.name == "computercraft:turtle_expanded"
-            	 then os.sleep(2)
-            	 end
-             end
-    	 else turtle.digDown()
-    	 end
-     end
+      while turtle.detectDown() == true do
+        	 local success, item = turtle.inspectDown() 
+            	 if success then
+                	 if item.name == "computercraft:turtle_expanded"
+                	 then os.sleep(2)
+                	 end
+                 end
+        	 else turtle.digDown()
+        	 end
+         end
+      end
   turtle.down()
   end
 end
 
+
 function dig_and_move_up(steps)
   for i = 1, steps do
-  while turtle.detectUp() == true do
-    	 local success, item = turtle.inspectUp() 
-        	 if success then
-            	 if item.name == "computercraft:turtle_expanded"
-            	 then os.sleep(2)
-            	 end
-             end
-    	 else turtle.digUp()
-    	 end
-     end
+      while turtle.detectUp() == true do
+        	 local success, item = turtle.inspectUp() 
+            	 if success then
+                	 if item.name == "computercraft:turtle_expanded"
+                	 then os.sleep(2)
+                	 end
+                 end
+        	 else turtle.digUp()
+        	 end
+         end
+      end
   turtle.up()
   end
 end
