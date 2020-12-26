@@ -13,30 +13,36 @@ function string:split(delimiter)
   return result
 end
 
-while(turtle.detect()) do
-	os.sleep(0.5)
-end
+function mining_deployment()
 
-turtle.suckDown(1)
-turtle.place()
-newTurtle = peripheral.wrap("front")
-newTurtle.turnOn()
-os.sleep(15)
-turtle.dig()
-turtle.turnRight()
+    turtle.suckDown(1)
+    turtle.place()
+    newTurtle = peripheral.wrap("front")
+    newTurtle.turnOn()
+    os.sleep(2)
 
-for i = 1, slots do 
-	turtle.select(i)
-	item = turtle.getItemDetail(i)
-	if item ~= nil then
-		print(item["name"])
+    while(turtle.detect()) do
+    	os.sleep(0.5)
+    end
+    
 
-			if item["name"] == "computercraft:turtle_expanded" then
-				turtle.dropDown()
-			else 
-				turtle.drop()
-			end
-	end
+    	end
+    end    
 end
 	
 turtle.turnLeft()
+
+
+while true do 
+
+	mining_jobs_available = "http://127.0.0.1:5000/mining_jobs_available"
+	http_request = http.get(mining_jobs_available)
+	mining_inputs = http_request.readAll()
+	
+	if mining_inputs == 0 then
+    	os.sleep(2)
+    	
+    else mining_deployment()
+        
+	
+end

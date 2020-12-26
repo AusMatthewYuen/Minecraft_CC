@@ -65,6 +65,18 @@ def mining_request():
     
     return returned_string
 
+
+@app.route('/mining_jobs_available')
+def mining_request():
+    df_count_result = pd.read_sql_query(con = engine, sql = """select count(*) as count from "Mining".mining_jobs""")
+    
+    if df_count_result.empty == True:
+        return str("0")
+    
+    num_jobs = str(df_count_result['count'][0])
+        
+    return num_jobs
+
 @app.route('/mining_request')
 def mining_queue_add():
     x = int(request.args.get('x')) #if key doesn't exist, returns None
