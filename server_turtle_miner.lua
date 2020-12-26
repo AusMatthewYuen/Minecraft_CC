@@ -14,7 +14,7 @@ function string:split(delimiter)
 end
 
 function reshuffle_turtle()
-   	local success, item = turtle.inspectDown() 
+   	local success, item = turtle.inspectUp() 
    	if success then
        	if item.name == "computercraft:turtle_expanded" then
          turtle.digUp()
@@ -46,6 +46,7 @@ function mining_deployment()
     else
         os.sleep(2)
         print("no turtles available")
+        reshuffle_turtle()
     end
     
 end
@@ -57,7 +58,7 @@ while true do
 	http_request = http.get(mining_jobs_available)
 	mining_inputs = http_request.readAll()
 	
-	if mining_inputs == 0 then
+	if mining_inputs == '0' then
     	print("no jobs available")
     	os.sleep(2)
         reshuffle_turtle()
