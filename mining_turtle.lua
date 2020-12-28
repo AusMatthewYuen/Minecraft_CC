@@ -396,18 +396,35 @@ function docking_station_movement(current_x, current_y, current_z)
 	return x_steps, y_steps, z_steps
 	
 end
+
+function get_mining_job_list(current_x, current_y, current_z)
+
+	request_mining_server = "http://127.0.0.1:5000/mining_job_server_allocation?".."x="..current_x.."&y="..current_y.."&z="..current_z
+	http_request = http.get(request_mining_server)
+	mining_inputs = http_request.readAll()
+	
+	target_table = docking_point_inputs:split(",")
+	
+	job_server = target_table[1]
+
+	return job_server
+
+end
+
 	
 function mining_operations()
 
 	origin_x ,origin_y , origin_z = gps.locate()
 
-	request_mining_location = "http://127.0.0.1:5000/mining_path"
+    job_server = get_mining_job_list()
+    
+   	request_mining_location = "http://127.0.0.1:5000/mining_path?".."mining_job_server="..job_server
 	http_request = http.get(request_mining_location)
 	mining_inputs = http_request.readAll()
 	
 	while mining_inputs == "no jobs" 
 	do os.sleep(5)
-	request_mining_location = "http://127.0.0.1:5000/mining_path"
+	request_mining_location = "http://127.0.0.1:5000/mining_path?".."mining_job_server="..job_server
 	http_request = http.get(request_mining_location)
 	mining_inputs = http_request.readAll()
 	end

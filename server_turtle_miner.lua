@@ -50,11 +50,32 @@ function mining_deployment()
     end
     
 end
+
+function get_mining_job_list(current_x, current_y, current_z)
+
+	request_mining_server = "http://127.0.0.1:5000/mining_job_server_allocation?".."x="..current_x.."&y="..current_y.."&z="..current_z
+	http_request = http.get(request_mining_server)
+	mining_inputs = http_request.readAll()
 	
+	target_table = docking_point_inputs:split(",")
+	
+	job_server = target_table[1]
+
+	return job_server
+
+end
+    
+    
+
+end
+	
+origin_x ,origin_y , origin_z = gps.locate()
+
+job_server = get_mining_job_list(origin_x ,origin_y , origin_z)
 
 while true do 
 
-	mining_jobs_available = "http://127.0.0.1:5000/mining_jobs_available"
+	mining_jobs_available = "http://127.0.0.1:5000/mining_jobs_available?".."mining_job_server="..job_server
 	http_request = http.get(mining_jobs_available)
 	mining_inputs = http_request.readAll()
 	

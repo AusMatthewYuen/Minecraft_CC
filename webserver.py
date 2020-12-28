@@ -1,7 +1,6 @@
 from flask import Flask
 from flask import request
 from datetime import datetime
-from flask import stream_with_context
 app = Flask(__name__)
 
 import psycopg2
@@ -33,9 +32,53 @@ def gps_link():
         return_string = str(location['x'][0] +',' + location['y'][0] + ',' + location['z'][0])
         return return_string
     
+@app.route('/mining_job_server_allocation')
+def mining_server_finder():
+    
+    x = int(request.args.get('x')) #if key doesn't exist, returns None
+    y = int(request.args.get('y'))
+    z = int(request.args.get('z'))
+    
+    sql_query = """
+    select 
+    object_label
+
+    from "Mining".infrastructure_locations INFRA
+    where object_type = 'Drop_Point'
+    
+    order by 
+    
+    abs(cast({0} as int) - cast(x as int)) 
+    + abs(cast({1} as int) - cast(y as int)) 
+    + abs(cast({2} as int) - cast(z as int))  asc
+    
+    limit 1
+    """.format(x,y,z)
+    
+    df_mining_server = pd.read_sql_query(con = engine, sql = sql_query)
+    
+    if df_mining_server.empty == True:
+        return str("error, no docking point available")
+    
+    returned_string = df_mining_server['object_label'][0]
+        
+    return returned_string
+
+    
 @app.route('/mining_path')
 def mining_request():
-    df_mining_result = pd.read_sql_query(con = engine, sql = """  select * from "Mining".mining_jobs order by time desc limit 1""")
+    
+    mining_job_server = str(request.args.get('mining_job_server'))
+    
+    sql_query = """
+    
+    select * from "Mining".mining_jobs_allocated 
+    where mining_job_server = '{0}'
+    order by time desc limit 1
+    
+    """.format(mining_job_server)
+    
+    df_mining_result = pd.read_sql_query(con = engine, sql = sql_query)
     
     if df_mining_result.empty == True:
         return str("no jobs")
@@ -54,7 +97,8 @@ def mining_request():
     and y = '{1}' 
     and z = '{2}' 
     and time = '{3}'
-    """.format(x,y,z,time))
+    and mining_job_server = '{4}'
+    """.format(x,y,z,time,mining_job_server))
     
     returned_string = str((x,y,z,x_quarry,y_quarry,z_quarry))
     
@@ -68,7 +112,17 @@ def mining_request():
 
 @app.route('/mining_jobs_available')
 def mining_jobs_check():
-    df_count_result = pd.read_sql_query(con = engine, sql = """select count(*) as count from "Mining".mining_jobs""")
+    
+    mining_job_server = request.args.get('mining_job_server')
+    
+    sql_query = """
+    
+    select count(*) as count from "Mining".mining_jobs_allocated
+    where object_label = '{0}'
+    
+    """
+
+    df_count_result = pd.read_sql_query(con = engine, sql = sql_query)
     
     if df_count_result.empty == True:
         return str("0")
@@ -88,6 +142,7 @@ def mining_queue_add():
     numbots = int(request.args.get('numbots'))
     
     mining_job_splitter(x,y,z,xquarry,yquarry,zquarry,numbots)
+    mining_job_queue_allocator()
     
     return ('job added to queue')
 
@@ -170,7 +225,7 @@ def docking_station_location():
     return returned_string
         
 
-def mining_job_splitter(x, y ,z , xquarry = 50 ,yquarry = 1,zquarry = 1,numbots = 2):
+def mining_job_splitter(x, y ,z , xquarry = 50 ,yquarry = 1,zquarry = 1,numbots = 4):
     
     remainder = xquarry % numbots
     multiple = xquarry // numbots
@@ -193,4 +248,38 @@ def mining_job_splitter(x, y ,z , xquarry = 50 ,yquarry = 1,zquarry = 1,numbots 
     df = pd.DataFrame(mining_jobs,columns = headers)
 
     df.to_sql( schema = 'Mining', name = 'mining_jobs',con = engine, if_exists = 'append')
+    
+def mining_job_queue_allocator():
+    print('pi')
+    
+    sql_query = """
+    
+    with mining_queue_allocator as 
+    
+        (
+            select
+            MINING.*
+            , INFRA.object_label
+            , rank() OVER (
+            				PARTITION BY MINING.x, MINING.y, MINING.z ORDER BY    
+            			      abs(cast(MINING.x as int) - cast(INFRA.x as int)) 
+                			+ abs(cast(MINING.y as int) - cast(INFRA.y as int)) 
+                			+ abs(cast(MINING.z as int) - cast(INFRA.z as int))  asc 
+            			  ) as mining_rank
+            FROM "Mining".mining_jobs MINING
+            
+            CROSS JOIN "Mining".infrastructure_locations INFRA
+            WHERE INFRA.object_type = 'Docking_Station'
+        )
+        
+    select * from mining_queue_allocator
+    where mining_rank = 1 
+    
+    """
+    
+    df = pd.read_sql_query(con = engine, sql = sql_query)
+    
+    df.to_sql( schema = 'Mining', name = 'mining_jobs_allocated',con = engine, if_exists = 'append')
+    
+    
 
