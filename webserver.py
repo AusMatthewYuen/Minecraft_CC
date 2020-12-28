@@ -44,7 +44,7 @@ def mining_server_finder():
     object_label
 
     from "Mining".infrastructure_locations INFRA
-    where object_type = 'Drop_Point'
+    where object_type = 'Docking_Station'
     
     order by 
     
@@ -73,7 +73,7 @@ def mining_request():
     sql_query = """
     
     select * from "Mining".mining_jobs_allocated 
-    where mining_job_server = '{0}'
+    where object_label = '{0}'
     order by time desc limit 1
     
     """.format(mining_job_server)
@@ -92,12 +92,12 @@ def mining_request():
     time = df_mining_result['time'][0]
     
     engine.execute("""
-    delete from "Mining".mining_jobs 
+    delete from "Mining".mining_jobs_allocated 
     where x = '{0}' 
     and y = '{1}' 
     and z = '{2}' 
     and time = '{3}'
-    and mining_job_server = '{4}'
+    and object_label = '{4}'
     """.format(x,y,z,time,mining_job_server))
     
     returned_string = str((x,y,z,x_quarry,y_quarry,z_quarry))
@@ -120,7 +120,7 @@ def mining_jobs_check():
     select count(*) as count from "Mining".mining_jobs_allocated
     where object_label = '{0}'
     
-    """
+    """.format(mining_job_server)
 
     df_count_result = pd.read_sql_query(con = engine, sql = sql_query)
     
@@ -247,7 +247,7 @@ def mining_job_splitter(x, y ,z , xquarry = 50 ,yquarry = 1,zquarry = 1,numbots 
         
     df = pd.DataFrame(mining_jobs,columns = headers)
 
-    df.to_sql( schema = 'Mining', name = 'mining_jobs',con = engine, if_exists = 'append')
+    df.to_sql( schema = 'Mining', name = 'mining_jobs',con = engine, if_exists = 'replace')
     
 def mining_job_queue_allocator():
     print('pi')

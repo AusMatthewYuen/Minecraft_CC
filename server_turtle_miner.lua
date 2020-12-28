@@ -55,19 +55,12 @@ function get_mining_job_list(current_x, current_y, current_z)
 
 	request_mining_server = "http://127.0.0.1:5000/mining_job_server_allocation?".."x="..current_x.."&y="..current_y.."&z="..current_z
 	http_request = http.get(request_mining_server)
-	mining_inputs = http_request.readAll()
+	server_inputs = http_request.readAll()
 	
-	target_table = docking_point_inputs:split(",")
-	
-	job_server = target_table[1]
-
-	return job_server
+	return server_inputs
 
 end
     
-    
-
-end
 	
 origin_x ,origin_y , origin_z = gps.locate()
 
