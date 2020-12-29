@@ -241,10 +241,10 @@ def mining_job_splitter(x, y ,z , xquarry = 50 ,yquarry = 1,zquarry = 1,numbots 
         
     if numbots != 1:
         if remainder != 0:
-            mining_jobs.append(('mining', x+(i * multiple + 1 + multiple), y, z,remainder  ,yquarry ,zquarry, timestamp))
+            mining_jobs.append(('mining', x+(i * multiple + multiple), y, z,remainder  ,yquarry ,zquarry))
         else:
-            mining_jobs.append(('mining', x+(i * multiple + 1 + multiple), y, z,multiple  ,yquarry ,zquarry, timestamp))
-        
+            mining_jobs.append(('mining', x+(i * multiple + multiple), y, z,multiple  ,yquarry ,zquarry))
+
     df = pd.DataFrame(mining_jobs,columns = headers)
 
     df.to_sql( schema = 'Mining', name = 'mining_jobs',con = engine, if_exists = 'replace')
@@ -264,7 +264,8 @@ def mining_job_queue_allocator():
             				PARTITION BY MINING.x, MINING.y, MINING.z ORDER BY    
             			      abs(cast(MINING.x as int) - cast(INFRA.x as int)) 
                 			+ abs(cast(MINING.y as int) - cast(INFRA.y as int)) 
-                			+ abs(cast(MINING.z as int) - cast(INFRA.z as int))  asc 
+                			+ abs(cast(MINING.z as int) - cast(INFRA.z as int))
+							, object_label asc 
             			  ) as mining_rank
             FROM "Mining".mining_jobs MINING
             
@@ -282,4 +283,42 @@ def mining_job_queue_allocator():
     df.to_sql( schema = 'Mining', name = 'mining_jobs_allocated',con = engine, if_exists = 'append')
     
     
+def mining_job_power_zone_check():
+    
+    sql_query_worldspike_range = """
+    
+    select 
+      cast(x as int) - 24 as x_min
+    , cast(x as int) + 24 as x_max
+    , cast(z as int) - 24 as z_min
+    , cast(z as int) + 24 as z_max
+    from "Mining".infrastructure_locations where object_type = 'Worldspike'
+    
+    """
+    
+    df_worldspikes = pd.read_sql_query(con = engine, sql = sql_query_worldspike_range)
+    
+    df_worldspikes.to_sql( schema = 'Mining', name = 'powered_grid_zones',con = engine, if_exists = 'replace')
+    
+    sql_query_power_zone_check = """
+    
+    select 
+    mining.*
+    from "Mining".mining_jobs mining
+    
+    cross join "Mining".powered_grid_zones power
+    
+    where mining.x between power.x_min and power.x_max
+    and mining.x + x_quarry between power.x_min and power.x_max
+    and mining.z between power.z_min and power.z_max
+    and mining.z + z_quarry between power.z_min and power.z_max
 
+
+    
+    """
+    
+    df_worldspikes_zone_check = pd.read_sql_query(con = engine, sql = sql_query_power_zone_check)
+    
+    df_worldspikes_zone_check.to_sql(schema = 'Mining', name = 'powered_grid_zones',con = engine, if_exists = 'replace')
+    
+        
