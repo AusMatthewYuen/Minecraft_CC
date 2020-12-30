@@ -5,6 +5,7 @@ app = Flask(__name__)
 
 import psycopg2
 import pandas as pd
+import numpy as np
 
 from sqlalchemy import create_engine
 engine = create_engine('postgresql+psycopg2://postgres:password@localhost/Minecraft', echo=False)
@@ -142,6 +143,7 @@ def mining_queue_add():
     numbots = int(request.args.get('numbots'))
     
     mining_job_splitter(x,y,z,xquarry,yquarry,zquarry,numbots)
+    mining_job_power_zone_check()
     mining_job_queue_allocator()
     
     return ('job added to queue')
@@ -267,7 +269,7 @@ def mining_job_queue_allocator():
                 			+ abs(cast(MINING.z as int) - cast(INFRA.z as int))
 							, object_label asc 
             			  ) as mining_rank
-            FROM "Mining".mining_jobs MINING
+            FROM "Mining".mining_within_powered_grid_zones MINING
             
             CROSS JOIN "Mining".infrastructure_locations INFRA
             WHERE INFRA.object_type = 'Docking_Station'
@@ -288,16 +290,23 @@ def mining_job_power_zone_check():
     sql_query_worldspike_range = """
     
     select 
-      cast(x as int) - 24 as x_min
-    , cast(x as int) + 24 as x_max
-    , cast(z as int) - 24 as z_min
-    , cast(z as int) + 24 as z_max
-    from "Mining".infrastructure_locations where object_type = 'Worldspike'
+      cast(INFRA.x as double precision) / 16.0 as xchunk
+    , cast(INFRA.z as double precision) / 16.0 as zchunk
     
+    from "Mining".infrastructure_locations INFRA where object_type = 'Worldspike'
+
     """
     
     df_worldspikes = pd.read_sql_query(con = engine, sql = sql_query_worldspike_range)
     
+    df_worldspikes['xchunk'] = df_worldspikes['xchunk'].apply(np.floor)
+    df_worldspikes['zchunk'] = df_worldspikes['zchunk'].apply(np.floor)
+    
+    df_worldspikes['xmin_chunk'] = df_worldspikes['xchunk'] - 1 
+    df_worldspikes['xmax_chunk'] = df_worldspikes['xchunk'] + 1 
+    df_worldspikes['zmin_chunk'] = df_worldspikes['zchunk'] - 1 
+    df_worldspikes['zmax_chunk'] = df_worldspikes['zchunk'] + 1 
+        
     df_worldspikes.to_sql( schema = 'Mining', name = 'powered_grid_zones',con = engine, if_exists = 'replace')
     
     sql_query_power_zone_check = """
@@ -308,17 +317,66 @@ def mining_job_power_zone_check():
     
     cross join "Mining".powered_grid_zones power
     
-    where mining.x between power.x_min and power.x_max
-    and mining.x + x_quarry between power.x_min and power.x_max
-    and mining.z between power.z_min and power.z_max
-    and mining.z + z_quarry between power.z_min and power.z_max
-
-
+    where mining.x/16 between power.xmin_chunk and power.xmax_chunk
+    and (mining.x + x_quarry) / 16 between power.xmin_chunk and power.xmax_chunk
+    and mining.z/16 between power.zmin_chunk and power.zmax_chunk
+    and (mining.z + z_quarry) / 16 between power.zmin_chunk and power.zmax_chunk
     
+
     """
     
     df_worldspikes_zone_check = pd.read_sql_query(con = engine, sql = sql_query_power_zone_check)
     
-    df_worldspikes_zone_check.to_sql(schema = 'Mining', name = 'powered_grid_zones',con = engine, if_exists = 'replace')
+    df_worldspikes_zone_check.to_sql(schema = 'Mining', name = 'mining_within_powered_grid_zones',con = engine, if_exists = 'replace')
     
+
+def powerline_creation_request():
+    
+    sql_query_worldspike_range = """
+    
+    
+    select xchunk, zchunk from "Mining".powered_grid_zones 
+    
+    """
+    
+    df_worldspikes = pd.read_sql_query(con = engine, sql = sql_query_worldspike_range)
+    
+    panda = [list(df_worldspikes['xchunk']),list(df_worldspikes['zchunk'])] 
+    
+    def powerline_chunk_job_plus_one(base_chunk):
         
+        chunk_job_x = []
+        chunk_job_z = []
+        coordinate_job_x = []
+        coordinate_job_z = []
+        
+        chunk_job_x.append(base_chunk[0] + 1)
+        chunk_job_z.append(base_chunk[1])
+        
+        chunk_job_x.append(base_chunk[0] - 1)
+        chunk_job_z.append(base_chunk[1])
+        
+        chunk_job_x.append(base_chunk[0])
+        chunk_job_z.append(base_chunk[1] + 1)
+    
+        chunk_job_x.append(base_chunk[0])
+        chunk_job_z.append(base_chunk[1] - 1)
+        
+        chunk_job_x.append(base_chunk[0] + 1)
+        chunk_job_z.append(base_chunk[1] + 1)
+    
+        chunk_job_x.append(base_chunk[0] - 1)
+        chunk_job_z.append(base_chunk[1] - 1)
+        
+        chunk_job_x.append(base_chunk[0] + 1)
+        chunk_job_z.append(base_chunk[1] - 1)
+    
+        chunk_job_x.append(base_chunk[0] - 1)
+        chunk_job_z.append(base_chunk[1] + 1)
+        
+        coordinate_job_x.append(list(map(lambda x : x * 16, chunk_job_x)))
+        coordinate_job_z.append(list(map(lambda x : x * 16, chunk_job_z))) 
+    
+        return(chunk_job_x, chunk_job_z,coordinate_job_x,coordinate_job_z)
+    
+    return(list(map(powerline_chunk_job_plus_one,panda)))
