@@ -219,14 +219,17 @@ function powerline_operations()
 	
 	while powerline_job_check == 0 do
     	os.sleep(5)
+    	powerline_job_check = "http://127.0.0.1:5000/powerline_jobs_available"
+    	http_request = http.get(powerline_job_check)
+    	powerline_job_check = http_request.readAll()
     end
 
     turtle.suckDown(1)
+    
+    origin_x , origin_y , origin_z = gps.locate()
 
     current_orientation = calculate_orientation()
 
-	origin_x , origin_y , origin_z = gps.locate()
-	
 	x_steps, y_steps, z_steps  = powerline_movement(origin_x ,origin_y , origin_z)
 	navigation_to_target(x_steps, y_steps, z_steps,current_orientation)
 	
