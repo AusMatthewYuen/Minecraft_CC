@@ -230,6 +230,8 @@ def docking_station_location():
 def powerline_one_step_expansion():
     
     powerline_creation_request()
+    
+    return "jobs added to queue"
 
 @app.route('/powerline_jobs_available')
 def powerline_jobs_available():
@@ -240,12 +242,11 @@ def powerline_jobs_available():
     
     from "Mining".powerline_available_jobs
     
-    limit 1
     """
     
     df_powerline_job_counter = pd.read_sql_query(con = engine, sql = sql_query)
     
-    if df_powerline_job_counter.empty():
+    if df_powerline_job_counter.empty == True:
         return 0
     else:
         return str(df_powerline_job_counter['counter'][0])
@@ -266,7 +267,7 @@ def powerline_job():
     
     df_powerline_job = pd.read_sql_query(con = engine, sql = sql_query)
     
-    if df_powerline_job.empty():
+    if df_powerline_job.empty == True:
         return 'no jobs'
         
     x = df_powerline_job['coordinate_job_x'][0]
@@ -441,11 +442,12 @@ def powerline_creation_request():
         coordinate_job_z.append(list(map(lambda x : x * 16, chunk_job_z))) 
     
         return(chunk_job_x, chunk_job_z,coordinate_job_x,coordinate_job_z)
-    
+
     job_map = list(map(powerline_chunk_job_plus_one,worldspike_list))
-    
+  
     for i in job_map:
-        q = zip(job_map[0],job_map[1],job_map[2],job_map[3])
+        print(i)
+        q = zip(i[0],i[1],i[2][0],i[3][0])
         headers = ['chunk_job_x', 'chunk_job_z', 'coordinate_job_x', 'coordinate_job_z']
         df = pd.DataFrame(q,columns = headers)        
         df_list.append(df)
@@ -463,8 +465,8 @@ def powerline_creation_request():
     	 case when chunk_job_x = xchunk and chunk_job_z = zchunk then 0 else 1 end as valid_job
     	, jobs.chunk_job_x
     	, jobs.chunk_job_z
-    	, jobs.coordinate_job_x
-    	, jobs.coordinate_job_z
+    	, cast(jobs.coordinate_job_x as int)
+    	, cast(jobs.coordinate_job_z as int)
     	
     	from "Mining".powerline_intermediate_jobs jobs
         
