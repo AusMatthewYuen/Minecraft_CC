@@ -188,20 +188,55 @@ function navigation_to_target(x_steps, y_steps, z_steps,current_orientation)
 	
 end
 
-function drop_point_movement(current_x, current_y, current_z)
+function powerline_movement(current_x, current_y, current_z)
 
-    request_drop_point_location = "http://127.0.0.1:5000/drop_point_location?".."x="..current_x.."&y="..current_y.."&z="..current_z
-	http_request = http.get(request_drop_point_location)
-	drop_point_inputs = http_request.readAll()
+    request_powerline_job = "http://127.0.0.1:5000/powerline_path"
+	http_request = http.get(request_powerline_job)
+	powerline_job_inputs = http_request.readAll()
 	
-	target_table = drop_point_inputs:split(",")
+	target_table = powerline_job_inputs:split(",")
 	
 	x = tonumber(target_table[1])
-	y = tonumber(target_table[2])
-	z = tonumber(target_table[3])
+	z = tonumber(target_table[2])
+	
+	y = 98 -- Default Height for all powerline movement operations. 
 	
 	x_steps, y_steps, z_steps = calculate_steps(x,y,z)
 	
 	return x_steps, y_steps, z_steps
 	
 end
+
+function powerline_operations()
+
+
+    powerline_job_check = "http://127.0.0.1:5000/powerline_jobs_available"
+	http_request = http.get(powerline_job_check)
+	powerline_job_check = http_request.readAll()
+	
+	while powerline_job_check == 0 do
+    	os.sleep(5)
+    end
+
+    turtle.suckDown()
+
+    current_orientation = calculate_orientation()
+
+	origin_x , origin_y , origin_z = gps.locate()
+	
+	x_steps, y_steps, z_steps  = powerline_movement(origin_x ,origin_y , origin_z)
+	navigation_to_target(x_steps, y_steps, z_steps,current_orientation)
+	
+	turtle.placeDown()
+	
+    current_orientation = calculate_orientation()
+    
+   	x_steps, y_steps, z_steps  = calculate_steps(origin_x ,origin_y , origin_z)
+	navigation_to_target(x_steps, y_steps, z_steps,current_orientation)
+	
+end
+
+while True do
+    powerline_operations()
+end
+
