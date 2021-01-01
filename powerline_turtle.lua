@@ -214,11 +214,12 @@ function powerline_operations()
 	http_request = http.get(powerline_job_check)
 	powerline_job_check = http_request.readAll()
 	
-	while powerline_job_check == 0 do
+	while powerline_job_check == "0" do
     	os.sleep(5)
     	powerline_job_check = "http://127.0.0.1:5000/powerline_jobs_available"
     	http_request = http.get(powerline_job_check)
     	powerline_job_check = http_request.readAll()
+    	print("no jobs available")
     end
 
     turtle.suckDown(1)
@@ -232,7 +233,7 @@ function powerline_operations()
 	
 	turtle.placeDown()
 	
-	powerline_update = "http://127.0.0.1:5000/powerline_update?"..target_x.."&y=".."98".."&z="..target_z
+	powerline_update = "http://127.0.0.1:5000/powerline_update?x="..target_x.."&z="..target_z
 	http_request = http.get(powerline_update)
 	
     current_orientation = calculate_orientation()

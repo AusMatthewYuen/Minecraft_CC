@@ -7,6 +7,8 @@ import psycopg2
 import pandas as pd
 import numpy as np
 
+import itertools
+
 from sqlalchemy import create_engine
 engine = create_engine('postgresql+psycopg2://postgres:password@localhost/Minecraft', echo=False)
 
@@ -247,22 +249,22 @@ def powerline_jobs_available():
     df_powerline_job_counter = pd.read_sql_query(con = engine, sql = sql_query)
     
     if df_powerline_job_counter.empty == True:
-        return 0
+        return "0"
     else:
         return str(df_powerline_job_counter['counter'][0])
     
 
 @app.route('/powerline_update')
 def powerline_placement_location():
-    x = int(request.args.get('x')) #if key doesn't exist, returns None
-    y = 98
-    z = int(request.args.get('z'))
+    x = request.args.get('x') #if key doesn't exist, returns None
+    y = '98'
+    z = request.args.get('z')
     
-    sql_query = """
+    engine.execute("""
     insert into "Mining".infrastructure_locations
     values (1,'Worldspike','Worldspike','{0}','{1}','{2}','Overworld')
 
-    """.format(x,y,z)
+    """.format(x,y,z))
         
     return 'powerline added to database'
     
@@ -290,8 +292,8 @@ def powerline_job():
     
     engine.execute("""
     delete from "Mining".powerline_available_jobs 
-    where coordinate_job_x = '{0}' 
-    and coordinate_job_z = '{1}' 
+    where coordinate_job_x = {0} 
+    and coordinate_job_z = {1}
     """.format(x,z))
     
     returned_string = str((x,z))
@@ -329,8 +331,7 @@ def mining_job_splitter(x, y ,z , xquarry = 50 ,yquarry = 1,zquarry = 1,numbots 
     df.to_sql( schema = 'Mining', name = 'mining_jobs',con = engine, if_exists = 'replace')
     
 def mining_job_queue_allocator():
-    print('pi')
-    
+
     sql_query = """
     
     with mining_queue_allocator as 
@@ -409,7 +410,68 @@ def mining_job_power_zone_check():
 
 def powerline_creation_request():
     
-    df_list = []
+    def powerline_chunk_job_plus_one(base_chunk):
+        
+        x_coordinates = base_chunk[0]
+        z_coordinates = base_chunk[1]
+        
+        chunk_job_x = []
+        chunk_job_z = []
+        coordinate_job_x = []
+        coordinate_job_z = []
+        
+        for i in range(len(x_coordinates)):
+
+            chunk_job_x.append(x_coordinates[i] + 1)
+            chunk_job_z.append(z_coordinates[i])
+            
+            chunk_job_x.append(x_coordinates[i] - 1)
+            chunk_job_z.append(z_coordinates[i])
+            
+            chunk_job_x.append(x_coordinates[i])
+            chunk_job_z.append(z_coordinates[i] + 1)
+            
+            chunk_job_x.append(x_coordinates[i])
+            chunk_job_z.append(z_coordinates[i] - 1)
+            
+            chunk_job_x.append(x_coordinates[i] + 1)
+            chunk_job_z.append(z_coordinates[i] + 1)
+        
+            chunk_job_x.append(x_coordinates[i] - 1)
+            chunk_job_z.append(z_coordinates[i] - 1)
+            
+            chunk_job_x.append(x_coordinates[i] + 1)
+            chunk_job_z.append(z_coordinates[i] - 1)
+        
+            chunk_job_x.append(x_coordinates[i] - 1)
+            chunk_job_z.append(z_coordinates[i] + 1)
+            
+        coordinate_job_x.append(list(map(lambda x : x * 16, chunk_job_x)))
+        coordinate_job_z.append(list(map(lambda x : x * 16, chunk_job_z))) 
+        
+        return chunk_job_x, chunk_job_z,coordinate_job_x[0],coordinate_job_z[0]
+    
+    sql_query_worldspike_range = """
+    
+    select 
+      cast(INFRA.x as double precision) / 16.0 as xchunk
+    , cast(INFRA.z as double precision) / 16.0 as zchunk
+    
+    from "Mining".infrastructure_locations INFRA where object_type = 'Worldspike'
+
+    """
+    
+    df_worldspikes = pd.read_sql_query(con = engine, sql = sql_query_worldspike_range)
+    
+    df_worldspikes['xchunk'] = df_worldspikes['xchunk'].apply(np.floor)
+    df_worldspikes['zchunk'] = df_worldspikes['zchunk'].apply(np.floor)
+    
+    df_worldspikes['xmin_chunk'] = df_worldspikes['xchunk'] - 1 
+    df_worldspikes['xmax_chunk'] = df_worldspikes['xchunk'] + 1 
+    df_worldspikes['zmin_chunk'] = df_worldspikes['zchunk'] - 1 
+    df_worldspikes['zmax_chunk'] = df_worldspikes['zchunk'] + 1 
+        
+    df_worldspikes.to_sql( schema = 'Mining', name = 'powered_grid_zones',con = engine, if_exists = 'replace')
     
     sql_query_worldspike_range = """
     
@@ -421,53 +483,15 @@ def powerline_creation_request():
     df_worldspikes = pd.read_sql_query(con = engine, sql = sql_query_worldspike_range)
     
     worldspike_list = [list(df_worldspikes['xchunk']),list(df_worldspikes['zchunk'])] 
+        
+    chunk_job_x, chunk_job_z,coordinate_job_x,coordinate_job_z = powerline_chunk_job_plus_one(worldspike_list)
     
-    def powerline_chunk_job_plus_one(base_chunk):
-        
-        chunk_job_x = []
-        chunk_job_z = []
-        coordinate_job_x = []
-        coordinate_job_z = []
-        
-        chunk_job_x.append(base_chunk[0] + 1)
-        chunk_job_z.append(base_chunk[1])
-        
-        chunk_job_x.append(base_chunk[0] - 1)
-        chunk_job_z.append(base_chunk[1])
-        
-        chunk_job_x.append(base_chunk[0])
-        chunk_job_z.append(base_chunk[1] + 1)
+    headers = ['chunk_job_x', 'chunk_job_z', 'coordinate_job_x', 'coordinate_job_z']
+    data = list(zip(chunk_job_x, chunk_job_z,coordinate_job_x,coordinate_job_z))
     
-        chunk_job_x.append(base_chunk[0])
-        chunk_job_z.append(base_chunk[1] - 1)
+    print(len(data))
         
-        chunk_job_x.append(base_chunk[0] + 1)
-        chunk_job_z.append(base_chunk[1] + 1)
-    
-        chunk_job_x.append(base_chunk[0] - 1)
-        chunk_job_z.append(base_chunk[1] - 1)
-        
-        chunk_job_x.append(base_chunk[0] + 1)
-        chunk_job_z.append(base_chunk[1] - 1)
-    
-        chunk_job_x.append(base_chunk[0] - 1)
-        chunk_job_z.append(base_chunk[1] + 1)
-        
-        coordinate_job_x.append(list(map(lambda x : x * 16, chunk_job_x)))
-        coordinate_job_z.append(list(map(lambda x : x * 16, chunk_job_z))) 
-    
-        return(chunk_job_x, chunk_job_z,coordinate_job_x,coordinate_job_z)
-
-    job_map = list(map(powerline_chunk_job_plus_one,worldspike_list))
-  
-    for i in job_map:
-        print(i)
-        q = zip(i[0],i[1],i[2][0],i[3][0])
-        headers = ['chunk_job_x', 'chunk_job_z', 'coordinate_job_x', 'coordinate_job_z']
-        df = pd.DataFrame(q,columns = headers)        
-        df_list.append(df)
-        
-    df = pd.concat(df_list)
+    df = pd.DataFrame(data,columns = headers)
     
     df.to_sql( schema = 'Mining', name = 'powerline_intermediate_jobs',con = engine, if_exists = 'replace')
 
@@ -477,8 +501,7 @@ def powerline_creation_request():
      
      	(
         select 
-    	 case when chunk_job_x = xchunk and chunk_job_z = zchunk then 0 else 1 end as valid_job
-    	, jobs.chunk_job_x
+    	  jobs.chunk_job_x
     	, jobs.chunk_job_z
     	, cast(jobs.coordinate_job_x as int)
     	, cast(jobs.coordinate_job_z as int)
@@ -497,7 +520,8 @@ def powerline_creation_request():
     , coordinate_job_x
     , coordinate_job_z
     from temp_table_job_validity 
-    where valid_job = 1
+	where concat(chunk_job_x,chunk_job_z) not in (select concat(xchunk, zchunk) from "Mining".powered_grid_zones )
+
     
     """
     
