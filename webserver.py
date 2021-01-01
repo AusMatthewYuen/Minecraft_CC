@@ -252,6 +252,21 @@ def powerline_jobs_available():
         return str(df_powerline_job_counter['counter'][0])
     
 
+@app.route('/powerline_update')
+def powerline_placement_location():
+    x = int(request.args.get('x')) #if key doesn't exist, returns None
+    y = 98
+    z = int(request.args.get('z'))
+    
+    sql_query = """
+    insert into "Mining".infrastructure_locations
+    values (1,'Worldspike','Worldspike','{0}','{1}','{2}','Overworld')
+
+    """.format(x,y,z)
+        
+    return 'powerline added to database'
+    
+
 @app.route('/powerline_path')
 def powerline_job():
     

@@ -198,15 +198,12 @@ function powerline_movement(current_x, current_y, current_z)
 	
 	x = tonumber(target_table[1])
 	z = tonumber(target_table[2])
-	
-	print(x)
-	print(z)
-	
+		
 	y = 98 -- Default Height for all powerline movement operations. 
 	
 	x_steps, y_steps, z_steps = calculate_steps(x,y,z)
 	
-	return x_steps, y_steps, z_steps
+	return x_steps, y_steps, z_steps, x , z
 	
 end
 
@@ -230,10 +227,13 @@ function powerline_operations()
 
     current_orientation = calculate_orientation()
 
-	x_steps, y_steps, z_steps  = powerline_movement(origin_x ,origin_y , origin_z)
+	x_steps, y_steps, z_steps , target_x, target_z  = powerline_movement(origin_x ,origin_y , origin_z)
 	navigation_to_target(x_steps, y_steps, z_steps,current_orientation)
 	
 	turtle.placeDown()
+	
+	powerline_update = "http://127.0.0.1:5000/powerline_update?"..target_x.."&y=".."98".."&z="..target_z
+	http_request = http.get(powerline_update)
 	
     current_orientation = calculate_orientation()
     
